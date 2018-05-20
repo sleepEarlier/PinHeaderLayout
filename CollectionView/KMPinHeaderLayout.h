@@ -10,4 +10,7 @@
 
 @interface KMPinHeaderLayout : UICollectionViewFlowLayout
 
+/// sections want to be pined, nil represents all sections
+@property (nonatomic, copy) NSIndexSet * pinedSections;
+
 @end

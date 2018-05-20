@@ -16,7 +16,7 @@ Pod::Spec.new do |s|
   #
 
   s.name         = "KMPinHeaderLayout"
-  s.version      = "0.1.0"
+  s.version      = "0.2.0"
   s.summary      = "Float header for collectionview, support both vertical and horizon."
 
   # This description is used to generate tags and improve search results.
