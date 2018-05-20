@@ -51,56 +51,53 @@
             
             CGRect frame = obj.frame;
             NSIndexPath *indexPath = obj.indexPath;
+            CGFloat contentOffset = self.scrollDirection == UICollectionViewScrollDirectionVertical?collectionView.contentOffset.y:collectionView.contentOffset.x;
             
-            if (!self.targetSectionIndexSet || [self.targetSectionIndexSet containsIndex:indexPath.section]) {
-                CGFloat contentOffset = self.scrollDirection == UICollectionViewScrollDirectionVertical?collectionView.contentOffset.y:collectionView.contentOffset.x;
-                
-                NSUInteger numberOfItemsInSection = [collectionView numberOfItemsInSection:indexPath.section];
-                
-                NSIndexPath *firstIndex = [NSIndexPath indexPathForItem:0 inSection:indexPath.section];
-                NSIndexPath *lastIndex = [NSIndexPath indexPathForItem:MAX(0, numberOfItemsInSection-1) inSection:indexPath.section];
-                UICollectionViewLayoutAttributes *firstCellAtt = nil, *lastCellAtt = nil;
-                
-                if (numberOfItemsInSection > 0) {
-                    firstCellAtt = [self layoutAttributesForItemAtIndexPath:firstIndex];
-                    lastCellAtt = /*numberOfItemsInSection == 1?firstCellAtt:*/[self layoutAttributesForItemAtIndexPath:lastIndex];
-                } else {
-                    firstCellAtt = [[UICollectionViewLayoutAttributes alloc]init];
-                    if (self.scrollDirection == UICollectionViewScrollDirectionVertical) {
-                        firstCellAtt.frame = CGRectMake(0, CGRectGetMaxY(frame) + sectionInset.top, 0, 0);
-                    } else {
-                        firstCellAtt.frame = CGRectMake(CGRectGetMaxX(frame) + sectionInset.left, 0, 0, 0);
-                    }
-                    
-                    lastCellAtt = firstCellAtt;
-                }
-                
-                CGFloat headerAppearPosition,headerDisappearPosition;
+            NSUInteger numberOfItemsInSection = [collectionView numberOfItemsInSection:indexPath.section];
+            
+            NSIndexPath *firstIndex = [NSIndexPath indexPathForItem:0 inSection:indexPath.section];
+            NSIndexPath *lastIndex = [NSIndexPath indexPathForItem:MAX(0, numberOfItemsInSection-1) inSection:indexPath.section];
+            UICollectionViewLayoutAttributes *firstCellAtt = nil, *lastCellAtt = nil;
+            
+            if (numberOfItemsInSection > 0) {
+                firstCellAtt = [self layoutAttributesForItemAtIndexPath:firstIndex];
+                lastCellAtt = /*numberOfItemsInSection == 1?firstCellAtt:*/[self layoutAttributesForItemAtIndexPath:lastIndex];
+            } else {
+                firstCellAtt = [[UICollectionViewLayoutAttributes alloc]init];
                 if (self.scrollDirection == UICollectionViewScrollDirectionVertical) {
-                    // 未置顶时header应该处于第一个cell上方
-                    // header从屏幕外(下方)滑动到置顶位置的过程，应取Y = headerAppearPostion
-                    // 该section的第一个cell到最后一个cell从header下滑出过程，header保持置顶，应取Y = contentOffset
-                    headerAppearPosition = firstCellAtt.frame.origin.y - sectionInset.top - frame.size.height;
-                    // 消失时header应该与最后一个cell+bottom的位置重合
-                    // 继续上滑，contentOffset继续增大，header应该消失，则Y取offset与headerDisappeaPosition的最小值
-                    headerDisappearPosition = CGRectGetMaxY(lastCellAtt.frame) + sectionInset.bottom - frame.size.height;
-                    
-                    frame.origin.y = MIN(
-                                         headerDisappearPosition, MAX(contentOffset, headerAppearPosition)
-                                         );
+                    firstCellAtt.frame = CGRectMake(0, CGRectGetMaxY(frame) + sectionInset.top, 0, 0);
                 } else {
-                    headerAppearPosition = firstCellAtt.frame.origin.x - sectionInset.left - frame.size.width;
-                    headerDisappearPosition = CGRectGetMaxX(lastCellAtt.frame) + sectionInset.right - frame.size.width;
-                    frame.origin.x = MIN(
-                                         headerDisappearPosition, MAX(contentOffset, headerAppearPosition)
-                                         );
+                    firstCellAtt.frame = CGRectMake(CGRectGetMaxX(frame) + sectionInset.left, 0, 0, 0);
                 }
                 
-                obj.frame = frame;
-                
-                // 修改zIdx，确认让header覆盖在cell上
-                obj.zIndex = 1;
+                lastCellAtt = firstCellAtt;
             }
+            
+            CGFloat headerAppearPosition,headerDisappearPosition;
+            if (self.scrollDirection == UICollectionViewScrollDirectionVertical) {
+                // 未置顶时header应该处于第一个cell上方
+                // header从屏幕外(下方)滑动到置顶位置的过程，应取Y = headerAppearPostion
+                // 该section的第一个cell到最后一个cell从header下滑出过程，header保持置顶，应取Y = contentOffset
+                headerAppearPosition = firstCellAtt.frame.origin.y - sectionInset.top - frame.size.height;
+                // 消失时header应该与最后一个cell+bottom的位置重合
+                // 继续上滑，contentOffset继续增大，header应该消失，则Y取offset与headerDisappeaPosition的最小值
+                headerDisappearPosition = CGRectGetMaxY(lastCellAtt.frame) + sectionInset.bottom - frame.size.height;
+
+                frame.origin.y = MIN(
+                                     headerDisappearPosition, MAX(contentOffset, headerAppearPosition)
+                                     );
+            } else {
+                headerAppearPosition = firstCellAtt.frame.origin.x - sectionInset.left - frame.size.width;
+                headerDisappearPosition = CGRectGetMaxX(lastCellAtt.frame) + sectionInset.right - frame.size.width;
+                frame.origin.x = MIN(
+                                     headerDisappearPosition, MAX(contentOffset, headerAppearPosition)
+                                     );
+            }
+            
+            obj.frame = frame;
+            
+            // 修改zIdx，确认让header覆盖在cell上
+            obj.zIndex = 1;
         }
     }];
     

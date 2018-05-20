@@ -24,7 +24,6 @@
     CGFloat wid = [UIScreen mainScreen].bounds.size.width;
     CGFloat hei = [UIScreen mainScreen].bounds.size.height;
     KMPinHeaderLayout *layout = [[KMPinHeaderLayout alloc]init];
-    layout.targetSectionIndexSet = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, 5)];
     if (self.vertical == YES) {
         layout.itemSize = CGSizeMake(wid, 50);
         layout.minimumLineSpacing = 15;
